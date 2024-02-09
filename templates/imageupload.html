@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title_block %} Upload Your Image {% endblock %}
+{% block body_block %}
+<div class="container mt-5">
+    <h2 class="mb-4">Upload Image</h2>
+    <form action="{{ url_for('ImageProcess') }}" method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+        <label for="image">Choose Image:</label>
+        <input type="file" class="form-control-file" id="image" name="image">
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</div>
+{% endblock %}
