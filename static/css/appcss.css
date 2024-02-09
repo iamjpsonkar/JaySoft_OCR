@@ -16,3 +16,8 @@ body {
     text-align: center;
     padding: 0.5em;
 }
+
+.normal-link {
+    color: bisque;
+    text-decoration: none;
+}
