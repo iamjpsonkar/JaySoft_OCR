@@ -1,11 +1,20 @@
 {% extends "base.html" %}
-{% block title_block %} Upload Your Image {% endblock %}
+{% block title_block %} OCR Output {% endblock %}
 {% block body_block %}
+<h3 class="text-center"><a class="btn btn-primary" href={{ url_for('ImageProcess') }}>Upload Another Image</a></h3>
 <div class="container">
-    <h1>Uploaded Image</h1>
-    <div>
-        <p>File Name: {{ filename }}</p>
-        <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+    <div class="row">
+        <div class="col-sm-6">
+            <h1>Uploaded Image</h1>
+            <p>File Name: {{ filename }}</p>
+            <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+        </div>
+        <div class="col-sm-6">
+            <h1 class="mt-5">Processed OCR text</h1>
+            <textarea class="form-control" rows="10">{% for text in text_list %}
+            {{ text }}
+            {% endfor %}</textarea>
+        </div>
     </div>
 </div>
 {% endblock %}

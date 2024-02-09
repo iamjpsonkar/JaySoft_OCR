@@ -33,20 +33,20 @@
                 </div>
             </div>
         </div>
+        {% block body_block %}
         <div style="flex:1">
-            {% block body_block %}
             <div class="d-flex flex-column align-items-center" style="padding:10%">
                 <p class="text-center">
                     <i>
                         "Our simple OCR web app quickly reads text from images. Just upload your picture, and our advanced technology does the rest. Whether it's printed documents, images with text, or scanned files, our app handles it all effortlessly. No more manual typing or data entry—our powerful OCR engine ensures accurate and reliable results every time. Say goodbye to tedious tasks and hello to streamlined document processing. With our user-friendly platform, digitizing text has never been easier. Experience the convenience of our OCR web app today!"
                     </i>
                 </p>
-                <a class="btn btn-primary" href="/image">
+                <a class="btn btn-primary" href={{ url_for('ImageProcess') }}>
                     Upload Image
                 </a>
             </div>            
-            {% endblock %}
         </div>
+        {% endblock %}
         <div  class="container-fluid footer text-center">
             <h3>Connect with Us</h3>
             <h4 class="text-center">

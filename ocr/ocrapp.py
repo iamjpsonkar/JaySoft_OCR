@@ -3,6 +3,9 @@ from flask.views import MethodView
 from logger import getLogger
 import os
 from config import UPLOAD_FOLDER
+import easyocr
+
+reader = easyocr.Reader(['en'])
 
 logger = getLogger()
 
@@ -18,6 +21,7 @@ class ImageProcess(MethodView):
     
     def post(self):
         file_path = ""
+        text_list = []
         if 'image' not in request.files:
             return 'No file part'
 
@@ -26,18 +30,12 @@ class ImageProcess(MethodView):
         if file.filename == '':
             return 'No selected file'
         else:
-
-            # Ensure the uploads directory exists
             os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-            # Save the file with its original name to the uploads directory
             file_path = os.path.join(UPLOAD_FOLDER, file.filename)
             file.save(file_path)
+            result = reader.readtext(file_path)
 
-        # Pass the image filename to the template for display
-        return render_template('imageview.html', filename=file.filename)
+            for detection in result:
+                text_list.append(detection[1])
 
-class OCR(MethodView):
-    def get(self):
-        logger.info("OCR route invoked")
-        return render_template('base.html')
+        return render_template('imageview.html', filename=file.filename, text_list=text_list)
