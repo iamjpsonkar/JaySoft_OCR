@@ -7,7 +7,7 @@
         <div class="col-sm-6">
             <h1>Uploaded Image</h1>
             <p>File Name: {{ filename }}</p>
-            <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image">
+            <img src="{{ url_for('uploaded_file', filename=filename) }}" alt="Uploaded Image" height="60%" width="100%">
         </div>
         <div class="col-sm-6">
             <h1 class="mt-5">Processed OCR text</h1>
