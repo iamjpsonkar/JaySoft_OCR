@@ -17,9 +17,11 @@ class Home(MethodView):
 class ImageProcess(MethodView):
     def get(self):
         logger.info("Image Upload route invoked")
+        os.system(f"rm -rf {UPLOAD_FOLDER}")
         return render_template('imageupload.html')
     
     def post(self):
+        logger.info("OCR route invoked")
         file_path = ""
         text_list = []
         if 'image' not in request.files:
