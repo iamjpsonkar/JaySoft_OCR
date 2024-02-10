@@ -1,11 +1,10 @@
 from sanic.views import HTTPMethodView
 from sanic.response import json
 from sanic.exceptions import FileNotFound
-import base64
 import httpx
 import logging
 from .ocr_secrets import ocr_api, apikey
-# logger = getLogger()
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
@@ -30,27 +29,16 @@ class OCR(HTTPMethodView):
         try:
             data = request.json
             base64_image = data.get('image')
-            
-            # Check if image exists
+
             if not base64_image:
                 raise FileNotFound("Image data is missing")
 
-            # # Decode base64 image data
-            # image_data = base64.b64decode(base64_image)
-
-            # # Save the decoded image to a desired location
-            # filename = 'uploaded_image.png'  # Example filename
-            # with open("uploads/"+filename, 'wb') as f:
-            #     f.write(image_data)
-
-            # # Respond with a success message or any other data
-            # return json({'message': 'Image uploaded successfully'})
             data_to_send = {
                 "apikey": apikey,
                 "base64Image" : base64_image,
                 "OCREngine": 3
             }
-            
+
             async with httpx.AsyncClient() as client:
                 response = await client.post(ocr_api, json=data_to_send)
                 response_data = response.json()

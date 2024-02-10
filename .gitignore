@@ -5,3 +5,4 @@ __pycache__/
 uploads/
 *.log
 node_modules
+ocr_secrets.py
