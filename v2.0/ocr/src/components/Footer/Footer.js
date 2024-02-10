@@ -2,7 +2,7 @@ import React from 'react';
 
 const Footer = () => {
     return (
-        <div className="container-fluid footer text-center">
+        <div className="container-fluid sticky-div">
             <h3>Connect with Us</h3>
             <h4 className="text-center">
                 <a className="btn btn-success" href="#" target="_blank">Facebook</a>

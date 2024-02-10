@@ -16,5 +16,5 @@ python -m app 2>&1 | tee "../$BACKEND_LOG" &
 sleep 5
 
 # Run frontend
-cd ../frontend/ocr
-npm start 2>&1 | tee "../../$FRONTEND_LOG"
+cd ../ocr
+npm start dev 2>&1 | tee "../../$FRONTEND_LOG"

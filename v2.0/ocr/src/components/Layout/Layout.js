@@ -1,15 +1,26 @@
 // Layout.js
 import React from 'react';
+import { Routes, Route } from 'react-router-dom';
 import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import Home from '../Home/Home';
-// import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import ImageUpload from '../ImageUpload/ImageUpload';
+import OcrResult from '../OcrResult/OcrResult';
+// import Contact from '../Contact/Contact';
 
-const Layout = ({ children }) => {
+const Layout = () => {
     return (
-        <div>
+        <div className="body-block">
             <Header />
-            <Home/>
+            <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="upload/image" element={<ImageUpload />} />
+                {/* <Route path="/ocr/result" element={<OcrResult />} /> */}
+                <Route
+                    path="/ocr/result"
+                    element={<OcrResult />}
+                />
+            </Routes>
             <Footer />
         </div>
     );
