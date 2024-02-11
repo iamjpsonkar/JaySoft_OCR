@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 from .models import Image, DB_URI
 import uuid
+import json as ujson
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -43,15 +44,6 @@ class OCR(HTTPMethodView):
 
             if not base64_image:
                 raise FileNotFound("Image data is missing")
-            
-            # Generate UUID for image ID
-            image_id = str(uuid.uuid4())
-
-            # Save image to database
-            async with SessionLocal() as session:
-                new_image = Image(image_id=image_id, image_name=image_name, image_type=image_type, base64image=base64_image)
-                session.add(new_image)
-                await session.commit()
 
             data_to_send = {
                 "apikey": apikey,
@@ -59,7 +51,7 @@ class OCR(HTTPMethodView):
                 "language": "eng",
                 "OCREngine": 2
             }
-            
+
             try:
                 data_to_send.update({
                     "filetype": image_type.split("/")[1].upper()
@@ -67,10 +59,26 @@ class OCR(HTTPMethodView):
                 logger.info(f'Image Type {image_type.split("/")[1].upper()}')
             except Exception as e:
                 logger.info(f"Image Type Error {image_type}", e)
-
+            response_data = {}
             async with httpx.AsyncClient() as client:
                 response = await client.post(ocr_api, json=data_to_send)
                 response_data = response.json()
+
+            # Generate UUID for image ID
+            image_id = str(uuid.uuid4())
+
+            # Save image to database
+            async with SessionLocal() as session:
+                new_image = Image(
+                    image_id=image_id,
+                    image_name=image_name,
+                    image_type=image_type,
+                    base64image=base64_image,
+                    ocr_json=ujson.dumps(response_data)
+                )
+                session.add(new_image)
+                await session.commit()
+
             logger.info("ocr_api_response",response_data)
             return json(response_data)
         except FileNotFound as e:
