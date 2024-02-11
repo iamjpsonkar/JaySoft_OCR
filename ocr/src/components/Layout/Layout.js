@@ -10,7 +10,7 @@ import OcrResult from '../OcrResult/OcrResult';
 
 const Layout = () => {
     return (
-        <div className="body-block">
+        <div>
             <Header />
             <Routes>
                 <Route path="/" element={<Home />} />
@@ -21,6 +21,7 @@ const Layout = () => {
                     element={<OcrResult />}
                 />
             </Routes>
+            <div className='content'></div>
             <Footer />
         </div>
     );

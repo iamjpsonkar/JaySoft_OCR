@@ -2,7 +2,7 @@ import React from 'react';
 
 const Home = () => {
     return (
-        <div className="body-block">
+        <div>
             <div className="d-flex flex-column align-items-center" style={{ padding: '10%' }}>
                 <p className="text-center">
                     <i>

@@ -3,13 +3,15 @@
     color: bisque;
 }
 
-.body-bloack {
-    position: relative;
-    min-height: 100vh; /* Ensure the container takes up at least the full viewport height */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure body fills the viewport */
 }
 
-.sticky-div {
-    position: absolute;
+.footer {
+    position: fixed;
+    left: 0;
     bottom: 0;
     width: 100%;
     background-color: #333;
