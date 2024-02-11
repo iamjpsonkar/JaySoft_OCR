@@ -58,12 +58,12 @@ const ImageUpload = () => {
     };
 
     return (
-        <div className="text-center">
+        <div className="text-center"  style={{ marginBottom: '100px' }}>
             <h2 className="mb-4">Upload Image</h2>
             <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <div className="form-group">
                     <label htmlFor="image">Choose Image:</label>
-                    <input type="file" className="form-control-file" id="image" name="image" onChange={handleFileChange} />
+                    <input type="file" className="form-control-file" id="image" name="image" accept="image/*" onChange={handleFileChange} />
                 </div>
                 {validFile && (
                     <>

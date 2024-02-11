@@ -5,6 +5,7 @@ import Header from '../Header/Header';
 import Footer from '../Footer/Footer';
 import Home from '../Home/Home';
 import ImageUpload from '../ImageUpload/ImageUpload';
+import Images from '../Images/Images';
 import OcrResult from '../OcrResult/OcrResult';
 // import Contact from '../Contact/Contact';
 
@@ -15,7 +16,7 @@ const Layout = () => {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="upload/image" element={<ImageUpload />} />
-                {/* <Route path="/ocr/result" element={<OcrResult />} /> */}
+                <Route path="/images" element={<Images />} />
                 <Route
                     path="/ocr/result"
                     element={<OcrResult />}

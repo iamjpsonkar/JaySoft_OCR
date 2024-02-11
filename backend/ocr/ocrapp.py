@@ -3,6 +3,10 @@ from sanic.response import json
 from sanic.exceptions import FileNotFound
 import httpx
 import logging
+
+import hashlib
+
+from sqlalchemy import select
 from .ocr_secrets import ocr_api, apikey
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
@@ -19,20 +23,25 @@ logger = logging.getLogger(__name__)
 database_url = DB_URI
 engine = create_async_engine(DB_URI, echo=True, future=True)
 SessionLocal = sessionmaker(
-    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession
+    autocommit=False, autoflush=False, bind=engine, class_=AsyncSession # type: ignore
 )
-
-
-class Health(HTTPMethodView):
-    async def get(self, request):
-        logger.info("Healthz get request invoked")
-        return json({"status": 200, "message": "Backend Server is running"})
-
 
 class OCR(HTTPMethodView):
     async def get(self, request):
-        logger.info("OCR get request invoked")
-        return json({"status": 200, "message": "GET request received"})
+        logger.info("Get all images request invoked")
+        async with SessionLocal() as session: # type: ignore
+            query = await session.execute(select(Image))
+            images = query.scalars().all()
+
+        image_list = []
+        for image in images:
+            image_list.append({
+                "base64html": image.base64image,
+                "image_id": image.image_id,
+                "image_name": image.image_name
+            })
+
+        return json(image_list)
 
     async def post(self, request):
         logger.info("OCR post request invoked")
@@ -41,19 +50,29 @@ class OCR(HTTPMethodView):
             base64_image = data.get("image")
             image_name = data.get("imageName")
             image_type = data.get("imageType")
+            image_id = data.get("image_id")
 
             if not base64_image:
                 raise FileNotFound("Image data is missing")
-            
-            response_data = await self.process_ocr(base64_image=base64_image,image_type=image_type)
-            
+
+            if image_id == None:
+                # Calculate checksum using base64Image
+                image_id = hashlib.sha256(base64_image.encode()).hexdigest()
+
+            async with SessionLocal() as session: # type: ignore
+                image = await session.get(Image, image_id)
+                if image:
+                    # Image with given image_id exists in the database
+                    response_data = ujson.loads(image.ocr_json)
+                    return json({"image": base64_image, "response_data": response_data})
+
+            # Process OCR if image not found in database
+            response_data = await self.process_ocr(base64_image=base64_image, image_type=image_type)
+
             logger.info("ocr response", response_data)
 
-            # Generate UUID for image ID
-            image_id = str(uuid.uuid4())
-
             # Save image to database
-            async with SessionLocal() as session:
+            async with SessionLocal() as session: # type: ignore
                 new_image = Image(
                     image_id=image_id,
                     image_name=image_name,
@@ -63,8 +82,12 @@ class OCR(HTTPMethodView):
                 )
                 session.add(new_image)
                 await session.commit()
+            response = {
+                "image": base64_image,
+                "response_data": response_data
+            }
 
-            return json(response_data)
+            return json(response)
         except FileNotFound as e:
             logger.info({"error": str(e)}, 400)
             return json({"error": str(e)}, status=400)

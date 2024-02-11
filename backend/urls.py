@@ -1,6 +1,6 @@
-from ocr.ocrapp import Health, OCR
+from ocr.ocrapp import OCR
 
 URLS = [
-    (Health.as_view(), "/backend/healthz", ["GET"], 'healthz_get'),
-    (OCR.as_view(), "/process/image", ["GET", "POST"], 'OCR'),
+    (OCR.as_view(), "/process/image", ["POST"], 'OCR'),
+    (OCR.as_view(), "/images", ["GET"], 'images'),
 ]
