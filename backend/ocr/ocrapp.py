@@ -4,9 +4,18 @@ from sanic.exceptions import FileNotFound
 import httpx
 import logging
 from .ocr_secrets import ocr_api, apikey
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from .models import Image, DB_URI
+import uuid
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
+# Database initialization
+database_url = DB_URI
+engine = create_async_engine(DB_URI, echo=True, future=True)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine, class_=AsyncSession)
 
 class Health(HTTPMethodView):
     async def get(self, request):
@@ -29,15 +38,35 @@ class OCR(HTTPMethodView):
         try:
             data = request.json
             base64_image = data.get('image')
+            image_name = data.get('imageName')
+            image_type = data.get('imageType')
 
             if not base64_image:
                 raise FileNotFound("Image data is missing")
+            
+            # Generate UUID for image ID
+            image_id = str(uuid.uuid4())
+
+            # Save image to database
+            async with SessionLocal() as session:
+                new_image = Image(image_id=image_id, image_name=image_name, image_type=image_type, base64image=base64_image)
+                session.add(new_image)
+                await session.commit()
 
             data_to_send = {
                 "apikey": apikey,
                 "base64Image" : base64_image,
-                "OCREngine": 3
+                "language": "eng",
+                "OCREngine": 2
             }
+            
+            try:
+                data_to_send.update({
+                    "filetype": image_type.split("/")[1].upper()
+                })
+                logger.info(f'Image Type {image_type.split("/")[1].upper()}')
+            except Exception as e:
+                logger.info(f"Image Type Error {image_type}", e)
 
             async with httpx.AsyncClient() as client:
                 response = await client.post(ocr_api, json=data_to_send)
@@ -48,5 +77,5 @@ class OCR(HTTPMethodView):
             logger.info({'error': str(e)}, 400)
             return json({'error': str(e)}, status=400)
         except Exception as e:
-            logger.info({'error': 'An error occurred while processing the image'}, 500)
+            logger.error({'error': 'An error occurred while processing the image'}, exc_info=True)
             return json({'error': 'An error occurred while processing the image'}, status=500)
