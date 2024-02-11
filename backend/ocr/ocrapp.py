@@ -123,7 +123,7 @@ class OCR(HTTPMethodView):
             result = reader.readtext(image_bytes)
 
             # Extract recognized text
-            recognized_text = [text[1] for text in result]
+            recognized_text = ' '.join(text[1] for text in result)
             return {"recognized_text": recognized_text}
 
         # return await using_free_ocr(base64_image,image_type)
